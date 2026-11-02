@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PropDeal · Buyer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ticker" role="region" aria-label="Offers and announcements"><div class="tk" id="tk"></div></div>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html" aria-label="PropDeal home"></a>
+  <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Search by title or city" aria-label="Search properties"></label>
+  <div class="sp"></div>
+  <div class="acct"><button class="av" id="av" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">·</button>
+    <div class="menu" id="menu" hidden><div class="mh"><b id="who"></b><small id="mail"></small><span class="rb" id="rl"></span></div><button class="mi" id="out" type="button">Log out</button></div></div>
+</div></header>
+<section class="hero2 sx" id="hero"><div class="slides" id="slides"></div><div class="hshade"></div>
+  <div class="wrap"><div class="hl">
+    <h1>Find your next <em>deal</em></h1><p>Browse every listing, open a property for full details and book a meeting with the seller.</p>
+    <div class="deal" id="deal"><span class="dtag">🔥 Limited-time deal</span><span class="dtxt" id="dtxt"></span>
+      <div class="clock" role="timer" aria-label="Time left on the deal"><span><b id="dh">00</b><small>hrs</small></span><i>:</i><span><b id="dm">00</b><small>min</small></span><i>:</i><span><b id="ds">00</b><small>sec</small></span></div>
+      <button class="btn sm" id="dbtn" type="button">View deals</button></div>
+  </div></div>
+  <div class="wrap sbar"><a id="scap" href="property.html?id=1"></a><div class="dots" id="dots" role="tablist" aria-label="Featured photos"></div></div>
+</section>
+<main class="wrap">
+  <div class="seg" role="tablist" aria-label="Sections"><button class="tab" data-v="b" aria-selected="true">Browse</button><button class="tab" data-v="m" aria-selected="false">My meetings <span class="bdg" id="bdg" hidden></span></button></div>
+  <div id="vB"><div class="fbar"><div id="bar"><div class="chips" id="chips" role="group" aria-label="Filter listings"></div></div><div class="count" id="count" aria-live="polite"></div></div><div class="grid" id="grid"></div></div>
+  <div id="vM" hidden><div class="mlist" id="ml"></div></div>
+</main>
+<footer class="wrap" style="padding:0 20px 40px;color:var(--muted);font-size:13px">Demo listings. Photos from <a href="https://unsplash.com" target="_blank" rel="noopener" style="color:inherit">Unsplash</a>.</footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+<script>
+me=need(['buyer','admin']);nav();
+props=loadProps();favs=S.get('pd2_favs_'+me.email,[]);
+const myM=()=>getM().filter(m=>m.buyer===me.email);
+function badge(){const n=myM().filter(m=>m.status==='confirmed').length;$('#bdg').hidden=!n;$('#bdg').textContent=n}
+function renderM(){const l=myM();
+  $('#ml').innerHTML=l.length?l.map(m=>`<div class="mt"><div><b>${esc(m.propTitle)}</b>
+    <div class="mu">${fmtDate(m.date)} at ${m.time} · with ${esc(pName(m.seller))}${rentTxt(m)}</div>${m.note?`<div class="mu">“${esc(m.note)}”</div>`:''}</div>
+    <span class="pill ${m.status}">${m.status}</span>${m.status==='pending'?`<button class="del" data-cancel="${m.id}">Cancel</button>`:''}</div>`).join(''):'<div class="empty">No meetings yet. Open a property and tap “Schedule a meeting”.</div>'}
+$('#ml').addEventListener('click',e=>{const c=e.target.closest('[data-cancel]');
+  if(c&&confirm('Cancel this meeting request?')){setM(getM().filter(m=>m.id!=c.dataset.cancel));renderM();badge();toast('Request cancelled')}});
+browse();tabs(renderM);badge();heroDeals(render);ticker();
+if(location.hash==='#meetings')document.querySelector('.tab[data-v=m]').click();
+</script>
+</body>
+</html>
